@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out project
         uses: actions/checkout@v4
@@ -23,10 +24,12 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build APK
+        working-directory: SpinAndroid
         run: gradle assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Spin-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: SpinAndroid/app/build/outputs/apk/debug/app-debug.apk
+          
