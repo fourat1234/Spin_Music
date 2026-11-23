@@ -23,13 +23,24 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Find Android project
+        run: |
+          PROJECT_FILE=$(find . -name settings.gradle -not -path './.git/*' -print -quit)
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "Could not find settings.gradle"
+            find . -maxdepth 4 -type f | head -100
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$PROJECT_FILE")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Found project in $PROJECT_DIR"
+
       - name: Build APK
-        working-directory: SpinAndroid
-        run: gradle assembleDebug --no-daemon
+        run: cd "$PROJECT_DIR" && gradle assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Spin-debug-apk
-          path: SpinAndroid/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           
